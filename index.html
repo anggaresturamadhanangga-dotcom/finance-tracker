@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Tracker</title>
-    <!-- CDN Tailwind CSS -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
@@ -25,12 +26,12 @@
         </section>
 
         <!-- Visualisasi Grafik -->
-<section class="bg-white p-5 rounded-xl shadow-md mb-6">
-    <h3 class="font-bold text-lg mb-4 text-gray-700">Analisis Keuangan</h3>
-    <div class="max-w-xs mx-auto">
-        <canvas id="grafik-keuangan"></canvas>
-    </div>
-</section>
+        <section class="bg-white p-5 rounded-xl shadow-md mb-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-700">Analisis Keuangan</h3>
+            <div class="max-w-xs mx-auto">
+                <canvas id="grafik-keuangan"></canvas>
+            </div>
+        </section>
 
         <!-- Form Input Transaksi -->
         <section class="bg-white p-5 rounded-xl shadow-md mb-6">
@@ -42,7 +43,7 @@
                         class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label for="nominal" class="block text-sm font-medium mb-1">Nominal (Rp)</label>
                         <input type="number" id="nominal" placeholder="15000" required
@@ -56,6 +57,18 @@
                             <option value="pengeluaran">Pengeluaran</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="kategori" class="block text-sm font-medium mb-1">Kategori</label>
+                        <select id="kategori" 
+                            class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Makanan">Makanan</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Gaji">Gaji</option>
+                            <option value="Kebutuhan">Kebutuhan</option>
+                            <option value="Hiburan">Hiburan</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
                 </div>
 
                 <button type="submit" 
@@ -65,9 +78,23 @@
             </form>
         </section>
 
-        <!-- Riwayat Transaksi -->
+        <!-- Riwayat Transaksi & Filter -->
         <section class="bg-white p-5 rounded-xl shadow-md">
-            <h3 class="font-bold text-lg mb-4 text-gray-700">Riwayat Transaksi</h3>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-lg text-gray-700">Riwayat Transaksi</h3>
+                <!-- Filter Dropdown -->
+                <select id="filter-kategori" onchange="updateUI()" 
+                    class="border border-gray-300 rounded-lg p-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="semua">Semua Kategori</option>
+                    <option value="Makanan">Makanan</option>
+                    <option value="Transportasi">Transportasi</option>
+                    <option value="Gaji">Gaji</option>
+                    <option value="Kebutuhan">Kebutuhan</option>
+                    <option value="Hiburan">Hiburan</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+
             <ul id="daftar-transaksi" class="space-y-3">
                 <!-- Data akan masuk di sini via JS -->
             </ul>
