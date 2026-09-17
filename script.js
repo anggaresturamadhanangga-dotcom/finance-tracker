@@ -1,4 +1,9 @@
-// 1. Ambil elemen HTML
+// 1. INISIALISASI SUPABASE CLIENT
+const SUPABASE_URL = 'sb_publishable_NO7OUPMqle4RaRP2cUxfsQ_74CsSowt'; // Ganti dengan Project URL milikmu
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2ZWR4Zmpkc3BtaXJuanBqbGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mzg3MTEsImV4cCI6MjEwNTIxNDcxMX0.7n009EuecBDXQW5NZguJhvO_ErkQPvZ-yNDMxUqLtMA';     // Ganti dengan anon/public key milikmu
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 2. Ambil elemen HTML
 const form = document.getElementById('form-transaksi');
 const keteranganInput = document.getElementById('keterangan');
 const nominalInput = document.getElementById('nominal');
@@ -9,10 +14,8 @@ const daftarTransaksi = document.getElementById('daftar-transaksi');
 const totalSaldoEl = document.getElementById('total-saldo');
 const inputFile = document.getElementById('input-file');
 
-// 2. Ambil data transaksi dari localStorage
-let transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
-
-// Variable instance grafik
+// Data transaksi lokal (diambil dari database)
+let transaksi = [];
 let chartKeuangan;
 
 // 3. Fungsi Inisialisasi Grafik
@@ -36,15 +39,33 @@ function inisialisasiGrafik(totalPemasukan, totalPengeluaran) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                }
+                legend: { position: 'bottom' }
             }
         }
     });
 }
 
-// 4. Fungsi Update UI & Hitung Saldo
+// 4. FUNGSI AMBIL DATA DARI SUPABASE DATABASE (CLOUD)
+async function ambilDataDariCloud() {
+    daftarTransaksi.innerHTML = `<li class="text-center text-gray-400 text-sm py-4">Memuat data dari database cloud...</li>`;
+
+    // Mengambil semua data dari tabel 'transaksi' di Supabase
+    const { data, error } = await supabase
+        .from('transaksi')
+        .select('*')
+        .order('id', { ascending: false });
+
+    if (error) {
+        console.error('Gagal mengambil data:', error);
+        alert('Gagal mengambil data dari cloud!');
+        return;
+    }
+
+    transaksi = data || [];
+    updateUI();
+}
+
+// 5. Fungsi Update UI & Hitung Saldo
 function updateUI() {
     daftarTransaksi.innerHTML = '';
     let totalSaldo = 0;
@@ -53,11 +74,11 @@ function updateUI() {
 
     transaksi.forEach(item => {
         if (item.tipe === 'pemasukan') {
-            totalSaldo += item.nominal;
-            totalPemasukan += item.nominal;
+            totalSaldo += Number(item.nominal);
+            totalPemasukan += Number(item.nominal);
         } else {
-            totalSaldo -= item.nominal;
-            totalPengeluaran += item.nominal;
+            totalSaldo -= Number(item.nominal);
+            totalPengeluaran += Number(item.nominal);
         }
     });
 
@@ -73,7 +94,6 @@ function updateUI() {
     }
 
     transaksiTersaring.forEach((item) => {
-        const indexAsli = transaksi.indexOf(item);
         const isPemasukan = item.tipe === 'pemasukan';
         const warnaNominal = isPemasukan ? 'text-green-600' : 'text-red-600';
         const tanda = isPemasukan ? '+' : '-';
@@ -95,9 +115,9 @@ function updateUI() {
             </div>
             <div class="flex items-center gap-3">
                 <span class="font-bold text-sm ${warnaNominal}">
-                    ${tanda} Rp ${item.nominal.toLocaleString('id-ID')}
+                    ${tanda} Rp ${Number(item.nominal).toLocaleString('id-ID')}
                 </span>
-                <button onclick="hapusTransaksi(${indexAsli})" 
+                <button onclick="hapusTransaksi(${item.id})" 
                     class="text-gray-400 hover:text-red-500 transition text-sm font-bold px-1">
                     ✕
                 </button>
@@ -108,13 +128,11 @@ function updateUI() {
     });
 
     totalSaldoEl.innerText = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
-    localStorage.setItem('transaksi', JSON.stringify(transaksi));
-
     inisialisasiGrafik(totalPemasukan, totalPengeluaran);
 }
 
-// 5. Form Submit Event
-form.addEventListener('submit', function(e) {
+// 6. FUNGSI SIMPAN TRANSAKSI BARU KE SUPABASE
+form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const transaksiBaru = {
@@ -124,20 +142,41 @@ form.addEventListener('submit', function(e) {
         kategori: kategoriInput.value
     };
 
-    transaksi.push(transaksiBaru);
-    updateUI();
+    // Menyimpan data baru ke tabel 'transaksi' Supabase
+    const { error } = await supabase
+        .from('transaksi')
+        .insert([transaksiBaru]);
+
+    if (error) {
+        console.error('Gagal menyimpan:', error);
+        alert('Gagal menyimpan ke database cloud!');
+        return;
+    }
 
     keteranganInput.value = '';
     nominalInput.value = '';
+
+    // Ambil ulang data terbaru dari cloud
+    ambilDataDariCloud();
 });
 
-// 6. Fungsi Hapus Transaksi
-function hapusTransaksi(index) {
-    transaksi.splice(index, 1);
-    updateUI();
+// 7. FUNGSI HAPUS TRANSAKSI DARI SUPABASE
+async function hapusTransaksi(id) {
+    const { error } = await supabase
+        .from('transaksi')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Gagal menghapus:', error);
+        alert('Gagal menghapus transaksi!');
+        return;
+    }
+
+    ambilDataDariCloud();
 }
 
-// 7. FUNGSI EKSPOR DATA (DOWNLOAD FILE .JSON)
+// 8. FUNGSI EKSPOR & IMPOR DATA
 function eksporData() {
     if (transaksi.length === 0) {
         alert('Tidak ada data transaksi untuk diekspor!');
@@ -153,9 +192,8 @@ function eksporData() {
     downloadAnchor.remove();
 }
 
-// 8. FUNGSI IMPOR DATA (READ FILE .JSON)
 function pilihFileImpor() {
-    inputFile.click(); // Memicu klik pada input file tersembunyi
+    inputFile.click();
 }
 
 function imporData(event) {
@@ -163,22 +201,29 @@ function imporData(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const dataHasilImpor = JSON.parse(e.target.result);
             if (Array.isArray(dataHasilImpor)) {
-                transaksi = dataHasilImpor;
-                updateUI();
-                alert('Data transaksi berhasil diimpor!');
+                // Hapus properti 'id' bawaan jika ada agar tidak bentrok dengan ID otomatis Supabase
+                const dataSiapUpload = dataHasilImpor.map(({ id, created_at, ...sisa }) => sisa);
+
+                const { error } = await supabase.from('transaksi').insert(dataSiapUpload);
+                
+                if (error) throw error;
+
+                alert('Data transaksi berhasil diimpor ke Cloud!');
+                ambilDataDariCloud();
             } else {
                 alert('Format file JSON tidak valid!');
             }
         } catch (err) {
-            alert('Gagal membaca file JSON!');
+            console.error(err);
+            alert('Gagal mengimpor data ke cloud!');
         }
     };
     reader.readAsText(file);
 }
 
-// Jalankan pertama kali
-updateUI();
+// Jalankan pengambilan data cloud saat halaman pertama kali dimuat
+ambilDataDariCloud();
