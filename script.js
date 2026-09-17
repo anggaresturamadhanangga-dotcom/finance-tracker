@@ -32,22 +32,36 @@ let currentUser = null;
 
 // LOGIKA NAVIGASI TAB SIDEBAR
 function gantiTab(tabName) {
+    // 1. Sembunyikan semua section tab
     document.getElementById('view-dashboard')?.classList.add('hidden');
     document.getElementById('view-transaksi')?.classList.add('hidden');
     document.getElementById('view-analytics')?.classList.add('hidden');
 
-    ['nav-dashboard', 'nav-transaksi', 'nav-analytics'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.className = 'p-2 hover:text-white transition';
+    // 2. Reset style seluruh tombol di navbar
+    const navs = ['nav-dashboard', 'nav-transaksi', 'nav-analytics'];
+    navs.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.className = 'relative group w-full p-3 hover:text-rose-400 hover:bg-white/5 rounded-2xl flex justify-center items-center transition-all duration-300 ease-out';
+            const indicator = btn.querySelector('.active-indicator');
+            if (indicator) indicator.classList.add('hidden');
+        }
     });
 
+    // 3. Beri style aktif & tampilkan indikator pada tombol yang diklik
     const activeNav = document.getElementById(`nav-${tabName}`);
-    if (activeNav) activeNav.className = 'p-2 text-rose-500 bg-white/5 rounded-xl';
+    if (activeNav) {
+        activeNav.className = 'relative group w-full p-3 text-rose-500 bg-rose-500/10 rounded-2xl flex justify-center items-center transition-all duration-300 ease-out border border-rose-500/20 shadow-md shadow-rose-950/30';
+        const activeIndicator = activeNav.querySelector('.active-indicator');
+        if (activeIndicator) activeIndicator.classList.remove('hidden');
+    }
 
+    // 4. Tampilkan tab yang dipilih
     const activeView = document.getElementById(`view-${tabName}`);
-    if (activeView) activeView.classList.remove('hidden');
+    if (activeView) {
+        activeView.classList.remove('hidden');
+    }
 }
-
 // LOGIKA AUTH
 function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
