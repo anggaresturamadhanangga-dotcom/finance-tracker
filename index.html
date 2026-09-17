@@ -79,10 +79,9 @@
         </section>
 
         <!-- Riwayat Transaksi & Filter -->
-        <section class="bg-white p-5 rounded-xl shadow-md">
+        <section class="bg-white p-5 rounded-xl shadow-md mb-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-lg text-gray-700">Riwayat Transaksi</h3>
-                <!-- Filter Dropdown -->
                 <select id="filter-kategori" onchange="updateUI()" 
                     class="border border-gray-300 rounded-lg p-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     <option value="semua">Semua Kategori</option>
@@ -98,6 +97,23 @@
             <ul id="daftar-transaksi" class="space-y-3">
                 <!-- Data akan masuk di sini via JS -->
             </ul>
+        </section>
+
+        <!-- Manajemen Backup Data -->
+        <section class="bg-white p-5 rounded-xl shadow-md">
+            <h3 class="font-bold text-sm text-gray-700 mb-3">Backup & Restore Data</h3>
+            <div class="flex gap-3">
+                <button onclick="eksporData()" 
+                    class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
+                    📥 Ekspor Data (JSON)
+                </button>
+                <button onclick="pilihFileImpor()" 
+                    class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
+                    📤 Impor Data
+                </button>
+                <!-- Input File Tersembunyi -->
+                <input type="file" id="input-file" class="hidden" accept=".json" onchange="imporData(event)">
+            </div>
         </section>
 
     </div>
