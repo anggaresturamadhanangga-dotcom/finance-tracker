@@ -1,7 +1,7 @@
 // 1. INISIALISASI SUPABASE CLIENT
 const SUPABASE_URL = 'sb_publishable_NO7OUPMqle4RaRP2cUxfsQ_74CsSowt'; // Ganti dengan Project URL milikmu
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2ZWR4Zmpkc3BtaXJuanBqbGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mzg3MTEsImV4cCI6MjEwNTIxNDcxMX0.7n009EuecBDXQW5NZguJhvO_ErkQPvZ-yNDMxUqLtMA';     // Ganti dengan anon/public key milikmu
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. Ambil elemen HTML
 const form = document.getElementById('form-transaksi');
@@ -50,7 +50,7 @@ async function ambilDataDariCloud() {
     daftarTransaksi.innerHTML = `<li class="text-center text-gray-400 text-sm py-4">Memuat data dari database cloud...</li>`;
 
     // Mengambil semua data dari tabel 'transaksi' di Supabase
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('transaksi')
         .select('*')
         .order('id', { ascending: false });
@@ -143,7 +143,7 @@ form.addEventListener('submit', async function(e) {
     };
 
     // Menyimpan data baru ke tabel 'transaksi' Supabase
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('transaksi')
         .insert([transaksiBaru]);
 
@@ -162,7 +162,7 @@ form.addEventListener('submit', async function(e) {
 
 // 7. FUNGSI HAPUS TRANSAKSI DARI SUPABASE
 async function hapusTransaksi(id) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('transaksi')
         .delete()
         .eq('id', id);
@@ -208,7 +208,7 @@ function imporData(event) {
                 // Hapus properti 'id' bawaan jika ada agar tidak bentrok dengan ID otomatis Supabase
                 const dataSiapUpload = dataHasilImpor.map(({ id, created_at, ...sisa }) => sisa);
 
-                const { error } = await supabase.from('transaksi').insert(dataSiapUpload);
+                const { error } = await supabaseClient.from('transaksi').insert(dataSiapUpload);
                 
                 if (error) throw error;
 
