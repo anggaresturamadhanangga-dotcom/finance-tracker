@@ -1,6 +1,6 @@
 // 1. INISIALISASI SUPABASE CLIENT
-const SUPABASE_URL = 'sb_publishable_NO7OUPMqle4RaRP2cUxfsQ_74CsSowt'; // Ganti dengan Project URL milikmu
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2ZWR4Zmpkc3BtaXJuanBqbGp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Mzg3MTEsImV4cCI6MjEwNTIxNDcxMX0.7n009EuecBDXQW5NZguJhvO_ErkQPvZ-yNDMxUqLtMA';     // Ganti dengan anon/public key milikmu
+const SUPABASE_URL = 'https://tvedxfjdspmirnjpjljw.supabase.co'; // Ganti dengan Project URL milikmu
+const SUPABASE_KEY = 'sb_publishable_NO7OUPMqle4RaRP2cUxfsQ_74CsSowt';     // Ganti dengan anon/public key milikmu
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. Ambil elemen HTML
