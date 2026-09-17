@@ -6,6 +6,7 @@
     <title>Personal Finance Tracker</title>
     <!-- CDN Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans text-gray-800">
 
@@ -22,6 +23,14 @@
             <p class="text-sm opacity-80">Total Saldo saat ini:</p>
             <h2 id="total-saldo" class="text-3xl font-extrabold mt-1">Rp 0</h2>
         </section>
+
+        <!-- Visualisasi Grafik -->
+<section class="bg-white p-5 rounded-xl shadow-md mb-6">
+    <h3 class="font-bold text-lg mb-4 text-gray-700">Analisis Keuangan</h3>
+    <div class="max-w-xs mx-auto">
+        <canvas id="grafik-keuangan"></canvas>
+    </div>
+</section>
 
         <!-- Form Input Transaksi -->
         <section class="bg-white p-5 rounded-xl shadow-md mb-6">
