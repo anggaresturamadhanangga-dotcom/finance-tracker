@@ -3,162 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Tracker</title>
+    <title>Personal Finance Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Remix Icon -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a1113;
+        }
+        .bg-dashboard {
+            background-color: #26191c;
+        }
+        .bg-card {
+            background-color: #332226;
+        }
+        .bg-card-hover:hover {
+            background-color: #402b30;
+        }
+        .accent-red {
+            background-color: #e63946;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans text-gray-800">
+<body class="text-gray-200 min-h-screen p-2 sm:p-6 flex items-center justify-center">
 
-    <div class="max-w-md mx-auto p-4 sm:max-w-xl md:max-w-2xl">
+    <!-- CONTAINER UTAMA DASHBOARD -->
+    <div class="w-full max-w-7xl bg-dashboard rounded-[32px] p-4 sm:p-6 shadow-2xl border border-white/5 min-h-[90vh] flex flex-col md:flex-row gap-6">
         
-        <!-- SECTION 1: FORM AUTHENTICATION (LOGIN & REGISTER) -->
-        <section id="auth-section" class="bg-white p-6 rounded-xl shadow-md my-12">
-            <h2 id="auth-title" class="text-2xl font-bold text-center text-indigo-600 mb-2">Masuk ke Akun</h2>
-            <p class="text-xs text-center text-gray-500 mb-6">Kelola data keuanganmu secara aman di cloud</p>
+        <!-- SECTION AUTH (DITAMPILKAN JIKA BELUM LOGIN) -->
+        <section id="auth-section" class="w-full max-w-md mx-auto my-auto bg-card p-8 rounded-3xl border border-white/10 shadow-xl">
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 bg-rose-600/20 text-rose-500 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                    <i class="ri-wallet-3-line"></i>
+                </div>
+            </div>
+            <h2 id="auth-title" class="text-2xl font-bold text-center text-white mb-1">Selamat Datang</h2>
+            <p class="text-xs text-center text-gray-400 mb-6">Masuk ke akun Finance Tracker kamu</p>
             
             <form id="form-auth" class="space-y-4">
                 <div>
-                    <label for="auth-email" class="block text-sm font-medium mb-1">Email</label>
+                    <label for="auth-email" class="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wider">Email</label>
                     <input type="email" id="auth-email" placeholder="nama@email.com" required
-                        class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        class="w-full bg-[#201417] border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-rose-500 focus:outline-none">
                 </div>
                 <div>
-                    <label for="auth-password" class="block text-sm font-medium mb-1">Password</label>
+                    <label for="auth-password" class="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wider">Password</label>
                     <input type="password" id="auth-password" placeholder="••••••••" required
-                        class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        class="w-full bg-[#201417] border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-rose-500 focus:outline-none">
                 </div>
                 <button type="submit" id="btn-auth-submit" 
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition duration-200">
+                    class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-rose-950">
                     Masuk
                 </button>
             </form>
 
-            <div class="text-center mt-4">
-                <button type="button" id="btn-toggle-auth" onclick="toggleAuthMode()" class="text-xs text-indigo-600 hover:underline">
+            <div class="text-center mt-6">
+                <button type="button" id="btn-toggle-auth" onclick="toggleAuthMode()" class="text-xs text-rose-400 hover:text-rose-300">
                     Belum punya akun? Daftar di sini
                 </button>
             </div>
         </section>
 
-        <!-- SECTION 2: DASHBOARD KEUANGAN (TERSEMBUNYI SEBELUM LOGIN) -->
-        <div id="dashboard-section" class="hidden">
+        <!-- DASHBOARD (TERSEMBUNYI SEBELUM LOGIN) -->
+        <div id="dashboard-section" class="hidden w-full flex flex-col md:flex-row gap-6">
             
-            <!-- Header & Tombol Logout -->
-            <header class="flex justify-between items-center my-6">
-                <div>
-                    <h1 class="text-2xl font-bold text-indigo-600">My Finance Tracker</h1>
-                    <p id="user-email-display" class="text-xs text-gray-500"></p>
+            <!-- SIDEBAR NAVIGASI KIRI -->
+            <aside class="w-full md:w-20 bg-card rounded-2xl p-4 flex md:flex-col justify-between items-center border border-white/5">
+                <div class="flex md:flex-col items-center gap-6 w-full">
+                    <div class="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                        <i class="ri-pulse-fill"></i>
+                    </div>
+                    <nav class="flex md:flex-col gap-4 text-gray-400 text-xl">
+                        <button class="p-2 text-rose-500 bg-white/5 rounded-xl"><i class="ri-dashboard-line"></i></button>
+                        <button class="p-2 hover:text-white transition"><i class="ri-exchange-line"></i></button>
+                        <button class="p-2 hover:text-white transition"><i class="ri-pie-chart-line"></i></button>
+                    </nav>
                 </div>
-                <button onclick="keluarAkun()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold py-2 px-3 rounded-lg border border-red-200 transition">
-                    🚪 Keluar
+                <button onclick="keluarAkun()" class="text-gray-400 hover:text-rose-500 text-xl p-2 transition" title="Keluar">
+                    <i class="ri-logout-box-r-line"></i>
                 </button>
-            </header>
+            </aside>
 
-            <!-- Ringkasan Saldo -->
-            <section class="bg-indigo-600 text-white rounded-xl p-5 shadow-lg mb-6">
-                <p class="text-sm opacity-80">Total Saldo saat ini:</p>
-                <h2 id="total-saldo" class="text-3xl font-extrabold mt-1">Rp 0</h2>
-            </section>
-
-            <!-- Visualisasi Grafik -->
-            <section class="bg-white p-5 rounded-xl shadow-md mb-6">
-                <h3 class="font-bold text-lg mb-4 text-gray-700">Analisis Keuangan</h3>
-                <div class="max-w-xs mx-auto">
-                    <canvas id="grafik-keuangan"></canvas>
-                </div>
-            </section>
-
-            <!-- Form Input Transaksi -->
-            <section class="bg-white p-5 rounded-xl shadow-md mb-6">
-                <h3 class="font-bold text-lg mb-4 text-gray-700">Tambah Transaksi Baru</h3>
-                <form id="form-transaksi" class="space-y-4">
+            <!-- KONTEN UTAMA -->
+            <main class="flex-1 space-y-6">
+                
+                <!-- HEADER (Search & Profile) -->
+                <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <label for="keterangan" class="block text-sm font-medium mb-1">Keterangan</label>
-                        <input type="text" id="keterangan" placeholder="Contoh: Makan Siang" required
-                            class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                            Good day, <span id="user-email-display" class="text-rose-400">User</span>
+                        </h1>
+                        <p class="text-xs text-gray-400">Ringkasan aktivitas keuangan kamu hari ini</p>
                     </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <input type="text" placeholder="Cari transaksi..." class="bg-card text-xs text-white placeholder-gray-500 px-4 py-2.5 rounded-full border border-white/10 pl-9 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                            <i class="ri-search-line absolute left-3 top-2.5 text-gray-500 text-xs"></i>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-rose-600/30 border border-rose-500/50 flex items-center justify-center text-rose-300 font-bold text-xs">
+                            FT
+                        </div>
+                    </div>
+                </header>
+
+                <!-- GRID UTAMA (BENTO BOX LAYOUT) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <div class="grid grid-cols-3 gap-3">
+                    <!-- KANAN ATAS / BANNER UTAMA: TOTAL SALDO -->
+                    <div class="lg:col-span-2 bg-gradient-to-r from-rose-900/40 to-card p-6 rounded-3xl border border-white/10 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
+                        <div class="absolute -right-6 -top-6 w-40 h-40 bg-rose-600/10 rounded-full blur-2xl"></div>
                         <div>
-                            <label for="nominal" class="block text-sm font-medium mb-1">Nominal (Rp)</label>
-                            <input type="number" id="nominal" placeholder="15000" required
-                                class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <span class="text-xs uppercase font-semibold text-rose-300 tracking-wider bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">Total Net Balance</span>
+                            <h2 id="total-saldo" class="text-4xl font-extrabold text-white mt-4">Rp 0</h2>
                         </div>
-                        <div>
-                            <label for="tipe" class="block text-sm font-medium mb-1">Tipe</label>
-                            <select id="tipe" 
-                                class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="pemasukan">Pemasukan</option>
-                                <option value="pengeluaran">Pengeluaran</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="kategori" class="block text-sm font-medium mb-1">Kategori</label>
-                            <select id="kategori" 
-                                class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="Makanan">Makanan</option>
-                                <option value="Transportasi">Transportasi</option>
-                                <option value="Gaji">Gaji</option>
-                                <option value="Kebutuhan">Kebutuhan</option>
-                                <option value="Hiburan">Hiburan</option>
-                                <option value="Lainnya">Lainnya</option>
-                            </select>
+                        <div class="flex gap-4 mt-6">
+                            <button onclick="document.getElementById('form-transaksi').scrollIntoView({behavior: 'smooth'})" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                                <i class="ri-add-line"></i> Transaksi Baru
+                            </button>
+                            <button onclick="eksporData()" class="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 transition">
+                                <i class="ri-download-2-line"></i> Backup Data
+                            </button>
                         </div>
                     </div>
 
-                    <button type="submit" 
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition duration-200">
-                        + Tambah Transaksi
-                    </button>
-                </form>
-            </section>
+                    <!-- STATISTIK (DOUGHNUT CHART CARD) -->
+                    <div class="bg-card p-5 rounded-3xl border border-white/5 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-sm text-white">Your Statistic</h3>
+                            <i class="ri-more-fill text-gray-500"></i>
+                        </div>
+                        <div class="w-36 h-36 mx-auto relative flex items-center justify-center">
+                            <canvas id="grafik-keuangan"></canvas>
+                        </div>
+                        <div class="text-center text-xs text-gray-400 mt-2">
+                            Perbandingan Pemasukan vs Pengeluaran
+                        </div>
+                    </div>
 
-            <!-- Riwayat Transaksi & Filter -->
-            <section class="bg-white p-5 rounded-xl shadow-md mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-lg text-gray-700">Riwayat Transaksi</h3>
-                    <select id="filter-kategori" onchange="updateUI()" 
-                        class="border border-gray-300 rounded-lg p-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        <option value="semua">Semua Kategori</option>
-                        <option value="Makanan">Makanan</option>
-                        <option value="Transportasi">Transportasi</option>
-                        <option value="Gaji">Gaji</option>
-                        <option value="Kebutuhan">Kebutuhan</option>
-                        <option value="Hiburan">Hiburan</option>
-                        <option value="Lainnya">Lainnya</option>
-                    </select>
                 </div>
 
-                <ul id="daftar-transaksi" class="space-y-3">
-                    <!-- Data akan masuk di sini via JS -->
-                </ul>
-            </section>
+                <!-- GRID BAWAH: FORM INPUT & RIWAYAT TRANSAKSI -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- FORM INPUT TRANSAKSI (CARD KIRI) -->
+                    <div class="bg-card p-6 rounded-3xl border border-white/5 space-y-4">
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                            <i class="ri-[#e63946] ri-add-circle-line text-rose-500"></i> Tambah Catatan
+                        </h3>
+                        <form id="form-transaksi" class="space-y-3">
+                            <div>
+                                <input type="text" id="keterangan" placeholder="Keterangan (contoh: Topup)" required
+                                    class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500">
+                            </div>
+                            <div>
+                                <input type="number" id="nominal" placeholder="Nominal (Rp)" required
+                                    class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="tipe" class="bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                                    <option value="pemasukan">Pemasukan</option>
+                                    <option value="pengeluaran">Pengeluaran</option>
+                                </select>
+                                <select id="kategori" class="bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                                    <option value="Makanan">Makanan</option>
+                                    <option value="Transportasi">Transportasi</option>
+                                    <option value="Gaji">Gaji</option>
+                                    <option value="Kebutuhan">Kebutuhan</option>
+                                    <option value="Hiburan">Hiburan</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                                Simpan Transaksi
+                            </button>
+                        </form>
+                    </div>
 
-            <!-- Backup & Restore -->
-            <section class="bg-white p-5 rounded-xl shadow-md">
-                <h3 class="font-bold text-sm text-gray-700 mb-3">Backup & Restore Data</h3>
-                <div class="flex gap-3">
-                    <button onclick="eksporData()" 
-                        class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                        📥 Ekspor Data (JSON)
-                    </button>
-                    <button onclick="pilihFileImpor()" 
-                        class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                        📤 Impor Data
-                    </button>
-                    <input type="file" id="input-file" class="hidden" accept=".json" onchange="imporData(event)">
+                    <!-- RIWAYAT TRANSAKSI (CARD KANAN WIDE) -->
+                    <div class="lg:col-span-2 bg-card p-6 rounded-3xl border border-white/5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-sm text-white">Recent Transactions</h3>
+                                <select id="filter-kategori" onchange="updateUI()" class="bg-[#201417] border border-white/10 text-xs text-gray-300 rounded-lg p-1.5 focus:outline-none">
+                                    <option value="semua">Semua Kategori</option>
+                                    <option value="Makanan">Makanan</option>
+                                    <option value="Transportasi">Transportasi</option>
+                                    <option value="Gaji">Gaji</option>
+                                    <option value="Kebutuhan">Kebutuhan</option>
+                                    <option value="Hiburan">Hiburan</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <ul id="daftar-transaksi" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                                <!-- Data dimasukkan via JS -->
+                            </ul>
+                        </div>
+
+                        <!-- IMPOR FILE BAR -->
+                        <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs">
+                            <span class="text-gray-400">Impor data JSON lama?</span>
+                            <button onclick="pilihFileImpor()" class="text-rose-400 hover:underline">Impor File</button>
+                            <input type="file" id="input-file" class="hidden" accept=".json" onchange="imporData(event)">
+                        </div>
+                    </div>
+
                 </div>
-            </section>
+
+            </main>
 
         </div>
 
     </div>
 
-    <!-- Hubungkan File JavaScript -->
+    <!-- Script JS -->
     <script src="script.js"></script>
 </body>
 </html>
