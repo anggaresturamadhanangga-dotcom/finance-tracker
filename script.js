@@ -6,13 +6,48 @@ const tipeInput = document.getElementById('tipe');
 const daftarTransaksi = document.getElementById('daftar-transaksi');
 const totalSaldoEl = document.getElementById('total-saldo');
 
-// 2. Ambil data transaksi dari localStorage (jika ada), atau gunakan array kosong []
+// 2. Ambil data transaksi dari localStorage
 let transaksi = JSON.parse(localStorage.getItem('transaksi')) || [];
 
-// 3. Fungsi untuk memperbarui tampilan UI & menghitung total saldo
+// Variable untuk menyimpan instance grafik
+let chartKeuangan;
+
+// 3. Fungsi untuk Inisialisasi Grafik Chart.js
+function inisialisasiGrafik(totalPemasukan, totalPengeluaran) {
+    const ctx = document.getElementById('grafik-keuangan').getContext('2d');
+    
+    // Jika grafik sudah pernah dibuat, hancurkan dulu sebelum menggambar ulang
+    if (chartKeuangan) {
+        chartKeuangan.destroy();
+    }
+
+    chartKeuangan = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pemasukan', 'Pengeluaran'],
+            datasets: [{
+                data: [totalPemasukan, totalPengeluaran],
+                backgroundColor: ['#10B981', '#EF4444'], // Warna hijau dan merah
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+}
+
+// 4. Fungsi untuk memperbarui UI & menghitung saldo
 function updateUI() {
     daftarTransaksi.innerHTML = '';
     let totalSaldo = 0;
+    let totalPemasukan = 0;
+    let totalPengeluaran = 0;
 
     if (transaksi.length === 0) {
         daftarTransaksi.innerHTML = `<li class="text-center text-gray-400 text-sm py-4">Belum ada transaksi.</li>`;
@@ -21,8 +56,10 @@ function updateUI() {
     transaksi.forEach((item, index) => {
         if (item.tipe === 'pemasukan') {
             totalSaldo += item.nominal;
+            totalPemasukan += item.nominal;
         } else {
             totalSaldo -= item.nominal;
+            totalPengeluaran += item.nominal;
         }
 
         const isPemasukan = item.tipe === 'pemasukan';
@@ -53,11 +90,15 @@ function updateUI() {
         daftarTransaksi.appendChild(li);
     });
 
+    // Update teks Total Saldo & simpan
     totalSaldoEl.innerText = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
     localStorage.setItem('transaksi', JSON.stringify(transaksi));
+
+    // Update Grafik
+    inisialisasiGrafik(totalPemasukan, totalPengeluaran);
 }
 
-// 4. Fungsi untuk menambah transaksi baru
+// 5. Form Submit Event
 form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -67,22 +108,18 @@ form.addEventListener('submit', function(e) {
         tipe: tipeInput.value
     };
 
-    // Masukkan data baru ke dalam array transaksi
     transaksi.push(transaksiBaru);
-
-    // Perbarui UI & Simpan
     updateUI();
 
-    // Reset isi form
     keteranganInput.value = '';
     nominalInput.value = '';
 });
 
-// 5. Fungsi untuk menghapus transaksi berdasarkan indeksnya
+// 6. Fungsi Hapus Transaksi
 function hapusTransaksi(index) {
-    transaksi.splice(index, 1); // Hapus 1 data pada indeks tersebut
-    updateUI(); // Perbarui tampilan & simpan ulang
+    transaksi.splice(index, 1);
+    updateUI();
 }
 
-// 6. Jalankan updateUI pertama kali saat halaman dibuka
+// Jalankan pertama kali
 updateUI();
