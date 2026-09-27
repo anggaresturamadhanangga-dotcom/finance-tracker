@@ -160,7 +160,7 @@ function updateUI() {
         if (item.tipe === 'pemasukan') {
             totalSaldo += Number(item.nominal);
             totalPemasukan += Number(item.nominal);
-        } else {
+        } else if (item.tipe === 'pengeluaran') {
             totalSaldo -= Number(item.nominal);
             totalPengeluaran += Number(item.nominal);
         }
@@ -169,16 +169,38 @@ function updateUI() {
     const katFull = filterKategoriFull ? filterKategoriFull.value : 'semua';
     const transaksiFullSaring = transaksi.filter(item => katFull === 'semua' || item.kategori === katFull);
 
-    const renderItem = (item) => {
+const renderItem = (item) => {
         const isPemasukan = item.tipe === 'pemasukan';
-        const warnaNominal = isPemasukan ? 'text-emerald-400' : 'text-rose-400';
-        const tanda = isPemasukan ? '+' : '-';
+        const isTransfer = item.tipe === 'transfer';
+        
+        let warnaNominal, tanda, iconBg, iconColor, iconClass;
+        
+        if (isTransfer) {
+            warnaNominal = 'text-blue-400';
+            tanda = '';
+            iconBg = 'bg-blue-500/10';
+            iconColor = 'text-blue-400';
+            iconClass = 'ri-swap-line'; // Ikon panah bolak-balik
+        } else if (isPemasukan) {
+            warnaNominal = 'text-emerald-400';
+            tanda = '+';
+            iconBg = 'bg-emerald-500/10';
+            iconColor = 'text-emerald-400';
+            iconClass = 'ri-arrow-down-line';
+        } else {
+            warnaNominal = 'text-rose-400';
+            tanda = '-';
+            iconBg = 'bg-rose-500/10';
+            iconColor = 'text-rose-400';
+            iconClass = 'ri-arrow-up-line';
+        }
+
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between p-3 rounded-2xl bg-[#201417] border border-white/5 hover:border-white/10 transition';
         li.innerHTML = `
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl ${isPemasukan ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'} flex items-center justify-center text-sm">
-                    <i class="${isPemasukan ? 'ri-arrow-down-line' : 'ri-arrow-up-line'}"></i>
+                <div class="w-8 h-8 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center text-sm">
+                    <i class="${iconClass}"></i>
                 </div>
                 <div>
                     <p class="font-semibold text-white text-xs">${item.keterangan}</p>
