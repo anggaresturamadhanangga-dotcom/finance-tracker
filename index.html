@@ -70,7 +70,7 @@
         <div id="dashboard-section" class="hidden w-full flex flex-col md:flex-row gap-6">
             
             <!-- SIDEBAR NAVIGASI -->
-           <!-- SIDEBAR NAVIGASI KIRI WITH SMOOTH ANIMATIONS -->
+            <!-- SIDEBAR NAVIGASI KIRI WITH SMOOTH ANIMATIONS -->
 <aside class="w-full md:w-20 bg-card rounded-3xl p-4 flex md:flex-col justify-between items-center border border-white/5 shadow-xl">
     <div class="flex md:flex-col items-center gap-6 w-full">
         <!-- Logo Brand dengan Efek Glow & Pulse -->
@@ -182,6 +182,20 @@
                                         <option value="Transfer Bank">Transfer Bank</option>
                                         <option value="Biaya Admin">Biaya Admin</option>
                                         <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                <!-- Input Tanggal -->
+                                <div class="mb-3">
+                                    <label class="block text-xs text-gray-400 mb-1">Tanggal Transaksi</label>
+                                    <input type="date" id="tanggal" class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
+                                </div>
+
+                                <!-- Input Jenis Uang -->
+                                <div class="mb-3">
+                                    <label class="block text-xs text-gray-400 mb-1">Sumber/Tujuan Uang</label>
+                                    <select id="metode_pembayaran" class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
+                                        <option value="Cash">💵 Uang Tunai (Cash)</option>
+                                        <option value="Saldo">💳 Saldo Bank/Digital</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-semibold py-2.5 rounded-xl transition shadow-lg shadow-rose-950">
