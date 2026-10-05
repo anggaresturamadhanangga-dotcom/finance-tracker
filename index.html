@@ -3,248 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>Finance Tracker Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #1a1113; }
-        .bg-dashboard { background-color: #26191c; }
-        .bg-card { background-color: #332226; }
-        
-        /* Animasi Smooth Fade-in */
-        .tab-content {
-            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </head>
-<body class="text-gray-200 min-h-screen p-2 sm:p-6 flex items-center justify-center">
-
-    <div class="w-full max-w-7xl bg-dashboard rounded-[32px] p-4 sm:p-6 shadow-2xl border border-white/5 min-h-[90vh] flex flex-col md:flex-row gap-6">
-        
-        <!-- AUTH SECTION -->
-        <section id="auth-section" class="w-full max-w-md mx-auto my-auto bg-card p-8 rounded-3xl border border-white/10 shadow-xl tab-content">
-            <div class="flex justify-center mb-4">
-                <div class="w-12 h-12 bg-rose-600/20 text-rose-500 rounded-2xl flex items-center justify-center text-2xl font-bold">
-                    <i class="ri-wallet-3-line"></i>
-                </div>
+<body class="bg-[#120b0d] text-white font-sans p-4 md:p-8 min-h-screen">
+    
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center bg-[#1c1215] p-5 rounded-2xl border border-white/5">
+            <div>
+                <h1 class="text-xl font-bold text-rose-400">Finance Tracker</h1>
+                <p class="text-xs text-gray-400">Dashboard Keuangan Personal</p>
             </div>
-            <h2 id="auth-title" class="text-2xl font-bold text-center text-white mb-1">Selamat Datang</h2>
-            <p class="text-xs text-center text-gray-400 mb-6">Masuk ke akun Finance Tracker kamu</p>
-            
-            <form id="form-auth" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wider">Email</label>
-                    <input type="email" id="auth-email" placeholder="nama@email.com" required
-                        class="w-full bg-[#201417] border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wider">Password</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" required
-                        class="w-full bg-[#201417] border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition">
-                </div>
-                <button type="submit" id="btn-auth-submit" 
-                    class="w-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-rose-950">
-                    Masuk
-                </button>
-            </form>
-
-            <div class="text-center mt-6">
-                <button type="button" id="btn-toggle-auth" onclick="toggleAuthMode()" class="text-xs text-rose-400 hover:text-rose-300 transition">
-                    Belum punya akun? Daftar di sini
-                </button>
+            <div class="text-right">
+                <p class="text-xs text-gray-400 mb-1">Total Saldo Aktif</p>
+                <h2 id="total-saldo" class="text-2xl font-bold text-white">Rp 0</h2>
             </div>
-        </section>
-
-        <!-- MAIN DASHBOARD -->
-        <div id="dashboard-section" class="hidden w-full flex flex-col md:flex-row gap-6">
-            
-            <!-- SIDEBAR NAVIGASI -->
-            <!-- SIDEBAR NAVIGASI KIRI WITH SMOOTH ANIMATIONS -->
-<aside class="w-full md:w-20 bg-card rounded-3xl p-4 flex md:flex-col justify-between items-center border border-white/5 shadow-xl">
-    <div class="flex md:flex-col items-center gap-6 w-full">
-        <!-- Logo Brand dengan Efek Glow & Pulse -->
-        <div class="w-11 h-11 bg-gradient-to-tr from-rose-700 to-rose-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-rose-900/50 hover:scale-105 transition-transform duration-300">
-            <i class="ri-pulse-fill animate-pulse"></i>
         </div>
-        
-        <!-- Menu Navigasi -->
-        <nav class="flex md:flex-col gap-3 text-gray-400 text-xl w-full">
-            <button id="nav-dashboard" onclick="gantiTab('dashboard')" 
-                class="relative group w-full p-3 text-rose-500 bg-rose-500/10 rounded-2xl flex justify-center items-center transition-all duration-300 ease-out border border-rose-500/20 shadow-md shadow-rose-950/30" 
-                title="Dashboard">
-                <i class="ri-dashboard-line group-hover:scale-110 transition-transform duration-300"></i>
-                <!-- Indicator Bar di Kanan (Mobile) / Kiri (Desktop) -->
-                <span class="active-indicator absolute left-0 w-1 h-5 bg-rose-500 rounded-r-full"></span>
-            </button>
 
-            <button id="nav-transaksi" onclick="gantiTab('transaksi')" 
-                class="relative group w-full p-3 hover:text-rose-400 hover:bg-white/5 rounded-2xl flex justify-center items-center transition-all duration-300 ease-out" 
-                title="Semua Transaksi">
-                <i class="ri-exchange-line group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300"></i>
-                <span class="active-indicator hidden absolute left-0 w-1 h-5 bg-rose-500 rounded-r-full"></span>
-            </button>
-
-            <button id="nav-analytics" onclick="gantiTab('analytics')" 
-                class="relative group w-full p-3 hover:text-rose-400 hover:bg-white/5 rounded-2xl flex justify-center items-center transition-all duration-300 ease-out" 
-                title="Analisis">
-                <i class="ri-pie-chart-line group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300"></i>
-                <span class="active-indicator hidden absolute left-0 w-1 h-5 bg-rose-500 rounded-r-full"></span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- Tombol Logout dengan Efek Hover Merah -->
-    <button onclick="keluarAkun()" 
-        class="group p-3 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all duration-300 flex justify-center items-center mt-4" 
-        title="Keluar">
-        <i class="ri-logout-box-r-line group-hover:translate-x-0.5 transition-transform duration-300"></i>
-    </button>
-</aside>
-
-            <!-- KONTEN -->
-            <main class="flex-1 space-y-6">
-                
-                <!-- HEADER -->
-                <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Bento Box: Form Input (Kiri) -->
+            <div class="md:col-span-1 bg-[#1c1215] p-5 rounded-2xl border border-white/5 h-fit">
+                <h3 class="text-sm font-bold text-white mb-4 border-b border-white/10 pb-2">Catat Transaksi</h3>
+                <form id="form-transaksi" class="space-y-3">
+                    
                     <div>
-                        <h1 class="text-xl font-bold text-white flex items-center gap-2">
-                            Good day, <span id="user-email-display" class="text-rose-400">User</span>
-                        </h1>
-                        <p class="text-xs text-gray-400">Ringkasan aktivitas keuangan kamu hari ini</p>
+                        <label class="block text-xs text-gray-400 mb-1">Keterangan</label>
+                        <input type="text" id="keterangan" required placeholder="Beli kopi, Gaji, dll" 
+                               class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500">
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-rose-600/30 border border-rose-500/50 flex items-center justify-center text-rose-300 font-bold text-xs">
-                            FT
-                        </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nominal (Rp)</label>
+                        <input type="number" id="nominal" required placeholder="50000" 
+                               class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500">
                     </div>
-                </header>
 
-                <!-- TAB 1: DASHBOARD UTAMA -->
-                <div id="view-dashboard" class="tab-content space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-gradient-to-r from-rose-900/40 to-card p-6 rounded-3xl border border-white/10 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
-                            <div class="absolute -right-6 -top-6 w-40 h-40 bg-rose-600/10 rounded-full blur-2xl"></div>
-                            <div>
-                                <span class="text-xs uppercase font-semibold text-rose-300 tracking-wider bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">Total Net Balance</span>
-                                <h2 id="total-saldo" class="text-4xl font-extrabold text-white mt-4 tracking-tight">Rp 0</h2>
-                            </div>
-                            <div class="flex gap-3 mt-6">
-                                <button onclick="eksporData()" class="bg-white/5 hover:bg-white/10 active:scale-95 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 transition flex items-center gap-2">
-                                    <i class="ri-download-2-line"></i> Backup Data
-                                </button>
-                                <button onclick="pilihFileImpor()" class="bg-white/5 hover:bg-white/10 active:scale-95 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 transition flex items-center gap-2">
-                                    <i class="ri-upload-2-line"></i> Impor Data
-                                </button>
-                                <input type="file" id="input-file" class="hidden" accept=".json" onchange="imporData(event)">
-                            </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Tipe</label>
+                            <select id="tipe" class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                                <option value="Pengeluaran">Pengeluaran</option>
+                                <option value="Pemasukan">Pemasukan</option>
+                                <option value="Transfer">Transfer Bank</option>
+                            </select>
                         </div>
-
-                        <div class="bg-card p-5 rounded-3xl border border-white/5 flex flex-col justify-between">
-                            <h3 class="font-bold text-sm text-white mb-2">Your Statistic</h3>
-                            <div class="w-36 h-36 mx-auto relative flex items-center justify-center">
-                                <canvas id="grafik-keuangan"></canvas>
-                            </div>
-                            <div class="text-center text-xs text-gray-400 mt-2">Ringkasan Keuangan</div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Kategori</label>
+                            <select id="kategori" class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                                <option value="Makanan">Makanan</option>
+                                <option value="Transportasi">Transportasi</option>
+                                <option value="Gaji">Gaji</option>
+                                <option value="Biaya Admin">Biaya Admin</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-card p-6 rounded-3xl border border-white/5 space-y-4">
-                            <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                                <i class="ri-add-circle-line text-rose-500"></i> Tambah Catatan
-                            </h3>
-                            <form id="form-transaksi" class="space-y-3">
-                                <input type="text" id="keterangan" placeholder="Keterangan" required class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
-                                <input type="number" id="nominal" placeholder="Nominal (Rp)" required class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <select id="tipe" class="bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                                        <option value="pemasukan">Pemasukan</option>
-                                        <option value="pengeluaran">Pengeluaran</option>
-                                        <option value="transfer">Transfer (Antar Bank)</option>
-                                    </select>
-                                    <select id="kategori" class="bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                                        <option value="Makanan">Makanan</option>
-                                        <option value="Transportasi">Transportasi</option>
-                                        <option value="Gaji">Gaji</option>
-                                        <option value="Kebutuhan">Kebutuhan</option>
-                                        <option value="Hiburan">Hiburan</option>
-                                        <option value="Transfer Bank">Transfer Bank</option>
-                                        <option value="Biaya Admin">Biaya Admin</option>
-                                        <option value="Lainnya">Lainnya</option>
-                                    </select>
-                                </div>
-                                <!-- Input Tanggal -->
-                                <div class="mb-3">
-                                    <label class="block text-xs text-gray-400 mb-1">Tanggal Transaksi</label>
-                                    <input type="date" id="tanggal" class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
-                                </div>
-
-                                <!-- Input Jenis Uang -->
-                                <div class="mb-3">
-                                    <label class="block text-xs text-gray-400 mb-1">Sumber/Tujuan Uang</label>
-                                    <select id="metode_pembayaran" class="w-full bg-[#201417] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-500 transition">
-                                        <option value="Cash">💵 Uang Tunai (Cash)</option>
-                                        <option value="Saldo">💳 Saldo Bank/Digital</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-semibold py-2.5 rounded-xl transition shadow-lg shadow-rose-950">
-                                    Simpan Transaksi
-                                </button>
-                            </form>
+                    <!-- FITUR BARU: Tanggal & Metode Pembayaran -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Tanggal</label>
+                            <input type="date" id="tanggal" required 
+                                   class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
                         </div>
-
-                        <div class="lg:col-span-2 bg-card p-6 rounded-3xl border border-white/5">
-                            <h3 class="font-bold text-sm text-white mb-4">Recent Transactions</h3>
-                            <ul id="daftar-transaksi" class="space-y-2 max-h-56 overflow-y-auto pr-1"></ul>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Sumber Uang</label>
+                            <select id="metode_pembayaran" class="w-full bg-[#2a1b1f] border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                                <option value="Saldo">💳 Saldo/Bank</option>
+                                <option value="Cash">💵 Uang Cash</option>
+                            </select>
                         </div>
                     </div>
+
+                    <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold py-3 rounded-xl transition mt-2">
+                        Simpan Transaksi
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bento Box: Riwayat Transaksi (Kanan) -->
+            <div class="md:col-span-2 bg-[#1c1215] p-5 rounded-2xl border border-white/5">
+                <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                    <h3 class="text-sm font-bold text-white">Riwayat Terbaru</h3>
                 </div>
-
-                <!-- TAB 2: RIWAYAT TRANSAKSI FULL -->
-                <div id="view-transaksi" class="hidden tab-content bg-card p-6 rounded-3xl border border-white/5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-lg text-white">Daftar Seluruh Transaksi</h3>
-                        <select id="filter-kategori-full" onchange="updateUI()" class="bg-[#201417] border border-white/10 text-xs text-gray-300 rounded-lg p-2 focus:outline-none">
-                            <option value="semua">Semua Kategori</option>
-                            <option value="Makanan">Makanan</option>
-                            <option value="Transportasi">Transportasi</option>
-                            <option value="Gaji">Gaji</option>
-                            <option value="Kebutuhan">Kebutuhan</option>
-                            <option value="Hiburan">Hiburan</option>
-                            <option value="Biaya Admin">Biaya Admin</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
-                    <ul id="daftar-transaksi-full" class="space-y-2 max-h-[450px] overflow-y-auto pr-2"></ul>
+                
+                <!-- List Riwayat -->
+                <div id="riwayat-list" class="space-y-2 h-[400px] overflow-y-auto pr-2">
+                    <p class="text-xs text-gray-500 text-center mt-10">Memuat data...</p>
                 </div>
+            </div>
 
-                <!-- TAB 3: ANALISIS ANALYTICS -->
-                <div id="view-analytics" class="hidden tab-content grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-card p-6 rounded-3xl border border-white/5 space-y-2">
-                        <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Pemasukan</span>
-                        <p id="total-pemasukan-text" class="text-3xl font-extrabold text-emerald-400">Rp 0</p>
-                    </div>
-                    <div class="bg-card p-6 rounded-3xl border border-white/5 space-y-2">
-                        <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Pengeluaran</span>
-                        <p id="total-pengeluaran-text" class="text-3xl font-extrabold text-rose-400">Rp 0</p>
-                    </div>
-                </div>
-
-            </main>
         </div>
     </div>
 
+    <!-- Panggil Script JS -->
     <script src="script.js"></script>
 </body>
 </html>
