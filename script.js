@@ -25,6 +25,10 @@ const totalPemasukanText = document.getElementById('total-pemasukan-text');
 const totalPengeluaranText = document.getElementById('total-pengeluaran-text');
 const inputFile = document.getElementById('input-file');
 
+// Tangkap nilainya
+const tanggalInput = document.getElementById('tanggal').value;
+const metodeInput = document.getElementById('metode_pembayaran').value;
+
 let transaksi = [];
 let chartKeuangan;
 let isRegisterMode = false;
@@ -62,6 +66,7 @@ function gantiTab(tabName) {
         activeView.classList.remove('hidden');
     }
 }
+
 // LOGIKA AUTH
 function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
@@ -111,6 +116,23 @@ async function keluarAkun() {
     await supabaseClient.auth.signOut();
     cekSesiUser();
 }
+
+// Pastikan tanggal diisi (validasi)
+if (!tanggalInput) {
+    alert("Tanggal wajib diisi!");
+    return;
+}
+
+// Tambahkan ke payload Supabase
+const { data, error } = await supabase
+    .from('transaksi')
+    .insert([
+        { 
+          // ... field lama kamu (keterangan, nominal, tipe, dll)
+          tanggal: tanggalInput,
+          metode_pembayaran: metodeInput 
+        }
+    ]);
 
 // DATABASE & UI RENDERING
 async function ambilDataDariCloud() {
@@ -169,7 +191,7 @@ function updateUI() {
     const katFull = filterKategoriFull ? filterKategoriFull.value : 'semua';
     const transaksiFullSaring = transaksi.filter(item => katFull === 'semua' || item.kategori === katFull);
 
-const renderItem = (item) => {
+    const renderItem = (item) => {
         const isPemasukan = item.tipe === 'pemasukan';
         const isTransfer = item.tipe === 'transfer';
         
